@@ -1,0 +1,5 @@
+.envrc
+!README.md
+!pyproject.toml
+!poetry.lock
+!backend
