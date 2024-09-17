@@ -30,6 +30,7 @@ function App() {
       <Dashboard
         uniqueCountries={uniqueCountries}
         uniqueBusinessUnit={uniqueBusinessUnit}
+        datalist={data}
       />
     </main>
   );
