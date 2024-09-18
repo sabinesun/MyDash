@@ -4,6 +4,7 @@ import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
 import { Header } from "@/components/header/header.tsx";
 import { CardIndicators } from "@/components/card/indicators-card.tsx";
+import { IndicatorLineChart } from "@/components/chart/line-chart.tsx";
 
 export const Dashboard = ({
   uniqueCountries,
@@ -22,7 +23,7 @@ export const Dashboard = ({
   );
 
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: addDays(new Date(), -20),
+    from: addDays(new Date(), -60),
     to: new Date(),
   });
 
@@ -52,6 +53,26 @@ export const Dashboard = ({
         date={date}
       />
       <CardIndicators filteredIds={filteredIds} date={date} />
+      <div className="grid grid-cols-2 gap-2">
+        <IndicatorLineChart
+          filteredIds={filteredIds}
+          date={date}
+          label="Revenue"
+          indicators={["total_revenue"]}
+        />
+        <IndicatorLineChart
+          filteredIds={filteredIds}
+          date={date}
+          label="CO₂ emissions"
+          indicators={["co2_emissions"]}
+        />
+        <IndicatorLineChart
+          filteredIds={filteredIds}
+          date={date}
+          label="Headcount"
+          indicators={["female_headcount", "male_headcount"]}
+        />
+      </div>
     </>
   );
 };

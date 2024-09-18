@@ -35,11 +35,12 @@ export const Card = ({ filteredIds, date, label, indicators, unit, icon }) => {
 
   if (isLoading || error)
     return (
-      <div className="flex w-full max-w-96 flex-col gap-2 rounded-md border border-primary bg-white p-8">
+      <div className="flex w-full flex-col gap-2 rounded-md border border-primary bg-white p-8">
         <div className="flex gap-2">
           {icon}
           <h2 className="text-lg">{label}</h2>
         </div>
+        <p className="flex justify-end text-4xl">0</p>
       </div>
     );
 
@@ -59,7 +60,7 @@ export const Card = ({ filteredIds, date, label, indicators, unit, icon }) => {
     (totalFemaleHeadcount / (totalFemaleHeadcount + totalMaleHeadcount)) * 100;
 
   return (
-    <div className="flex w-full max-w-96 flex-col gap-2 rounded-md border border-primary bg-white p-8">
+    <div className="flex w-full flex-col gap-2 rounded-md border border-primary bg-white p-8">
       <div className="flex gap-2">
         {icon}
         <h2 className="text-lg">{label}</h2>
