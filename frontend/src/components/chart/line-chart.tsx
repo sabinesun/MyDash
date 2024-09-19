@@ -60,7 +60,7 @@ export function IndicatorLineChart({ date, filteredIds, label, indicators }) {
     : findMinMaxHeadcount(chartData);
 
   return (
-    <div className="gap-2 bg-white p-10">
+    <div className="gap-2 rounded border border-primary bg-white p-10">
       <h2 className="mb-8 text-lg">{label}</h2>
       <ChartContainer config={chartConfig(label)}>
         <LineChart

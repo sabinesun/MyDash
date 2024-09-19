@@ -52,8 +52,10 @@ export const Dashboard = ({
         setBusinessUnit={setBusinessUnit}
         date={date}
       />
-      <CardIndicators filteredIds={filteredIds} date={date} />
-      <div className="grid grid-cols-2 gap-2">
+      <div className="m-10">
+        <CardIndicators filteredIds={filteredIds} date={date} />
+      </div>
+      <div className="m-10 grid grid-cols-3 gap-6">
         <IndicatorLineChart
           filteredIds={filteredIds}
           date={date}
