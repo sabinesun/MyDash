@@ -1,4 +1,3 @@
-import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 
@@ -10,8 +9,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DateRange } from "react-day-picker";
+import { Dispatch, SetStateAction } from "react";
 
-export function DatePickerWithRange({ className, date, setDate }) {
+type DatePickerWithRangeProps = {
+  date?: DateRange;
+  setDate: Dispatch<SetStateAction<DateRange | undefined>>;
+  className?: string;
+}
+
+export function DatePickerWithRange({ className, date, setDate }: DatePickerWithRangeProps) {
   return (
     <div className={cn("mx-2 grid gap-2", className)}>
       <Popover>
