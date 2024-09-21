@@ -1,4 +1,4 @@
-type Dimension = {
+export type Dimension = {
     id: string;
     country: string;
     business_unit: string;
@@ -7,3 +7,7 @@ type Dimension = {
 export type DimensionsResponse = {
     results: Dimension[];
 };
+
+export type SelectionItem = { name: string, isChecked: boolean }
+
+

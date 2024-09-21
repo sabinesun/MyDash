@@ -1,80 +1,62 @@
 import { useState } from "react";
-import * as React from "react";
 import { DateRange } from "react-day-picker";
-import { addDays } from "date-fns";
+import { subDays } from "date-fns";
 import { Header } from "@/components/header/header.tsx";
 import { CardIndicators } from "@/components/card/indicators-card.tsx";
-import { IndicatorLineChart } from "@/components/chart/line-chart.tsx";
+import { Dimension, SelectionItem } from "./types";
+import { LineChartContainer } from "./components/chart/chart-container";
+
+type DashboardProps = {
+  dimensionsList: Dimension[];
+}
 
 export const Dashboard = ({
-  uniqueCountries,
-  uniqueBusinessUnit,
-  datalist,
-}) => {
-  const [countries, setCountries] = useState(
-    uniqueCountries.map((country) => ({ name: country, isChecked: true })),
-  );
+  dimensionsList,
+}: DashboardProps) => {
 
-  const [businessUnit, setBusinessUnit] = useState(
-    uniqueBusinessUnit.map((businessUnit) => ({
-      name: businessUnit,
-      isChecked: true,
-    })),
-  );
+  const countriesList = getUniqueList(dimensionsList.map(item => item.country));
+  const businessUnitsList = getUniqueList(dimensionsList.map(item => item.business_unit));
 
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: addDays(new Date(), -60),
+  const [countries, setCountries] = useState(initializeSelectionList(countriesList));
+  const [businessUnits, setBusinessUnits] = useState(initializeSelectionList(businessUnitsList));
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 60),
     to: new Date(),
   });
 
-  const selectedCountries = countries
-    .filter((c) => c.isChecked)
-    .map((c) => c.name);
-  const selectedBusinessUnits = businessUnit
-    .filter((b) => b.isChecked)
-    .map((b) => b.name);
-
-  const filteredIds = datalist.results
-    .filter(
-      (item) =>
-        selectedCountries.includes(item.country) &&
-        selectedBusinessUnits.includes(item.business_unit),
-    )
-    .map((item) => item.id);
+  const selectedDimensions = getFilteredDimensionsId(dimensionsList, countries, businessUnits)
 
   return (
     <>
       <Header
         countries={countries}
         setCountries={setCountries}
-        businessUnit={businessUnit}
+        businessUnit={businessUnits}
         setDate={setDate}
-        setBusinessUnit={setBusinessUnit}
+        setBusinessUnit={setBusinessUnits}
         date={date}
       />
-      <div className="m-10">
-        <CardIndicators filteredIds={filteredIds} date={date} />
-      </div>
-      <div className="m-10 grid grid-cols-3 gap-6">
-        <IndicatorLineChart
-          filteredIds={filteredIds}
-          date={date}
-          label="Revenue"
-          indicators={["total_revenue"]}
-        />
-        <IndicatorLineChart
-          filteredIds={filteredIds}
-          date={date}
-          label="CO₂ emissions"
-          indicators={["co2_emissions"]}
-        />
-        <IndicatorLineChart
-          filteredIds={filteredIds}
-          date={date}
-          label="Headcount"
-          indicators={["female_headcount", "male_headcount"]}
-        />
-      </div>
+      <CardIndicators filteredIds={selectedDimensions} date={date} />
+      <LineChartContainer selectedDimensions={selectedDimensions} date={date} />
     </>
   );
 };
+
+
+const getSelectedItem = (itemList: SelectionItem[]) => {
+  return itemList.filter((item) => item.isChecked).map((item) => item.name)
+}
+
+const getFilteredDimensionsId = (dimensionsList: Dimension[], countries: SelectionItem[], businessUnits: SelectionItem[]) => {
+  return dimensionsList.filter(
+    (dimensions) =>
+      getSelectedItem(countries).includes(dimensions.country) &&
+      getSelectedItem(businessUnits).includes(dimensions.business_unit),
+  )
+    .map((dimensions) => dimensions.id);
+}
+
+const getUniqueList = (list: string[]) => [...new Set(list)];
+
+const initializeSelectionList = (list: string[]) => list.map(name => ({ name, isChecked: true }));
+

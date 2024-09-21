@@ -18,20 +18,10 @@ function App() {
 
   if (isLoading || error || !data) return null;
 
-  const uniqueCountries = Array.from(
-    new Set(data.results.map((item) => item.country)),
-  );
-
-  const uniqueBusinessUnit = Array.from(
-    new Set(data.results.map((item) => item.business_unit)),
-  );
-
   return (
     <main className="h-screen w-screen p-6">
       <Dashboard
-        uniqueCountries={uniqueCountries}
-        uniqueBusinessUnit={uniqueBusinessUnit}
-        datalist={data}
+        dimensionsList={data.results}
       />
     </main>
   );
