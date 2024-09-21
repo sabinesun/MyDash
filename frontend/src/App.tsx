@@ -1,7 +1,8 @@
 import { useQuery } from "react-query";
 import { Dashboard } from "@/dashboard.tsx";
+import { DimensionsResponse } from "./types";
 
-const fetchDimensions = async () => {
+const fetchDimensions = async (): Promise<DimensionsResponse> => {
   const response = await fetch("http://localhost:8080/dimensions");
   if (!response.ok) {
     throw new Error("Network response was not ok");
@@ -15,7 +16,7 @@ function App() {
     queryFn: fetchDimensions,
   });
 
-  if (isLoading || error) return null;
+  if (isLoading || error || !data) return null;
 
   const uniqueCountries = Array.from(
     new Set(data.results.map((item) => item.country)),
