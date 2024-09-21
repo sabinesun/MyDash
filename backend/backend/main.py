@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 def get_db():
-    db = sqlite3.connect("backend/kiosk.db")
+    db = sqlite3.connect("backend/kiosk.db", check_same_thread=False)
 
     db.execute("pragma journal_mode = WAL;")
     db.execute("pragma busy_timeout = 5000;")
