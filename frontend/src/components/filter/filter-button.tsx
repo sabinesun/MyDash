@@ -6,12 +6,21 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { Dispatch, SetStateAction } from "react";
+import { SelectionItem } from "@/types";
 
-export const Filter = ({ list, setList, label, icon }) => {
-  const handleCheckedChange = (name, checked) => {
+type FilterButtonProps = {
+  list: SelectionItem[],
+  setList: Dispatch<SetStateAction<SelectionItem[]>>,
+  label: string,
+  icon: JSX.Element,
+}
+
+export const FilterButton = ({ list, setList, label, icon }: FilterButtonProps) => {
+  const handleCheckedChange = ({ name, isChecked }: SelectionItem) => {
     setList((prevState) =>
       prevState.map((item) =>
-        item.name === name ? { ...item, isChecked: !checked } : item,
+        item.name === name ? { ...item, isChecked: !isChecked } : item,
       ),
     );
   };
@@ -19,9 +28,10 @@ export const Filter = ({ list, setList, label, icon }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="mx-2 gap-2">
+        <Button variant="outline" className="mx-2 gap-2 bg-white">
           {icon}
-          {label} <ChevronDownIcon />
+          {label}
+          <ChevronDownIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
@@ -29,7 +39,7 @@ export const Filter = ({ list, setList, label, icon }) => {
           <DropdownMenuCheckboxItem
             checked={item.isChecked}
             onCheckedChange={() =>
-              handleCheckedChange(item.name, item.isChecked)
+              handleCheckedChange(item)
             }
             key={item.name}
           >

@@ -1,10 +1,10 @@
-import { Filter } from "@/components/filter/dropdown-filter.tsx";
 import { BadgeFilter } from "@/components/filter/badge-filter.tsx";
 import { BackpackIcon, GlobeIcon } from "@radix-ui/react-icons";
 import { DatePickerWithRange } from "@/components/ui/date-range.tsx";
 import { SelectionItem } from "@/types";
 import { DateRange } from "react-day-picker";
 import { Dispatch, SetStateAction } from "react";
+import { FilterButton } from "../filter/filter-button";
 
 type HeaderProps = {
   countries: SelectionItem[];
@@ -27,13 +27,13 @@ export const Header = ({
     <>
       <header className="m-2 flex items-center">
         <h1 className="mr-8 text-4xl font-bold">MyDash.</h1>
-        <Filter
+        <FilterButton
           list={countries}
           setList={setCountries}
           label="Country"
           icon={<GlobeIcon />}
         />
-        <Filter
+        <FilterButton
           list={businessUnit}
           setList={setBusinessUnit}
           label="Business Unit"
