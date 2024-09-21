@@ -1,39 +1,36 @@
-import * as React from "react";
+import { Indicator, IndicatorResponse } from "@/types";
+import { DateRange } from "react-day-picker";
 import { useQuery } from "react-query";
 
-const fetchIndicators = async ({ start, end, dimensions, indicators }) => {
-  const dimensionParams = dimensions
-    .map((number) => `&dimension=${number}`)
-    .join("");
-
-  const indicatorsParams = indicators
-    .map((indicator) => `&indicators=${indicator}`)
-    .join("");
-
-  const response = await fetch(
-    `http://localhost:8080/indicators?start=${start}&end=${end}${indicatorsParams}${dimensionParams}`,
-  );
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  return await response.json();
+type FetchIndicatorsParams = {
+  startDate?: string;
+  endDate?: string;
+  dimensions: string[];
+  indicators: string[];
 };
 
-export const Card = ({ filteredIds, date, label, indicators, unit, icon }) => {
+type CardProps = {
+  selectedDimensions: string[];
+  date: DateRange | undefined;
+  label: string;
+  cardIndicators: string[];
+  icon: JSX.Element;
+  unit?: string;
+}
+
+export const Card = ({ selectedDimensions, date, label, cardIndicators, unit, icon }: CardProps) => {
   const { isLoading, error, data } = useQuery({
-    queryKey: ["indicators", indicators, date, filteredIds],
+    queryKey: ["indicators", cardIndicators, date, selectedDimensions],
     queryFn: () =>
       fetchIndicators({
-        start: date?.from?.toISOString().split("T")[0],
-        end: date?.to?.toISOString().split("T")[0],
-        dimensions: filteredIds,
-        indicators: indicators,
+        startDate: date?.from?.toISOString().split("T")[0],
+        endDate: date?.to?.toISOString().split("T")[0],
+        dimensions: selectedDimensions,
+        indicators: cardIndicators,
       }),
   });
 
-  if (isLoading || error)
+  if (isLoading || error || !data)
     return (
       <div className="flex w-full flex-col gap-2 rounded-md border border-primary bg-white p-8">
         <div className="flex gap-2">
@@ -44,21 +41,6 @@ export const Card = ({ filteredIds, date, label, indicators, unit, icon }) => {
       </div>
     );
 
-  const totalIndicatorValue = data.results
-    .filter((item) => indicators.includes(item.indicator))
-    .reduce((sum, item) => sum + item.value, 0);
-
-  const totalFemaleHeadcount = data.results
-    .filter((item) => item.indicator === "female_headcount")
-    .reduce((sum, item) => sum + item.value, 0);
-
-  const totalMaleHeadcount = data.results
-    .filter((item) => item.indicator === "male_headcount")
-    .reduce((sum, item) => sum + item.value, 0);
-
-  const genderRatio =
-    (totalFemaleHeadcount / (totalFemaleHeadcount + totalMaleHeadcount)) * 100;
-
   return (
     <div className="flex w-full flex-col gap-2 rounded-md border border-primary bg-white p-8">
       <div className="flex gap-2">
@@ -67,10 +49,42 @@ export const Card = ({ filteredIds, date, label, indicators, unit, icon }) => {
       </div>
       <p className="flex justify-end text-4xl">
         {label === "Gender Parity Ratio"
-          ? genderRatio.toFixed(2)
-          : totalIndicatorValue}
+          ? genderRatio(data.results)
+          : totalValue(data.results, cardIndicators)}
         {unit}
       </p>
     </div>
   );
 };
+
+const createParams = (paramName: string, values: string[]) =>
+  values.map((value) => `&${paramName}=${value}`).join("");
+
+const fetchIndicators = async ({ startDate, endDate, dimensions, indicators }: FetchIndicatorsParams): Promise<IndicatorResponse> => {
+  const url = `http://localhost:8080/indicators?start=${startDate}&end=${endDate}${createParams("indicators", indicators)}${createParams("dimensions", dimensions)}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  return await response.json();
+};
+
+const totalValue = (indicatorList: Indicator[], indicators: string[]) => {
+  return indicatorList.filter((item) => indicators.includes(item.indicator))
+    .reduce((sum, item) => sum + item.value, 0);
+}
+
+const genderRatio = (indicatorList: Indicator[]) => {
+  const totalFemaleHeadcount = indicatorList
+    .filter((item) => item.indicator === "female_headcount")
+    .reduce((sum, item) => sum + item.value, 0);
+
+  const totalMaleHeadcount = indicatorList
+    .filter((item) => item.indicator === "male_headcount")
+    .reduce((sum, item) => sum + item.value, 0);
+
+  return ((totalFemaleHeadcount / (totalFemaleHeadcount + totalMaleHeadcount)) * 100).toFixed(2);
+}
+

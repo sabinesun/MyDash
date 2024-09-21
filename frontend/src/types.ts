@@ -10,4 +10,15 @@ export type DimensionsResponse = {
 
 export type SelectionItem = { name: string, isChecked: boolean }
 
+export type Indicator = {
+    date: string;
+    dimension: string;
+    indicator: string;
+    value: number
+}
+
+export type IndicatorResponse = {
+    results: Indicator[]
+}
+
 
