@@ -1,10 +1,10 @@
-import { BadgeFilter } from "@/components/filter/badge-filter.tsx";
 import { BackpackIcon, GlobeIcon } from "@radix-ui/react-icons";
 import { DatePickerWithRange } from "@/components/ui/date-range.tsx";
 import { SelectionItem } from "@/types";
 import { DateRange } from "react-day-picker";
 import { Dispatch, SetStateAction } from "react";
 import { FilterButton } from "../filter/filter-button";
+import { FilterBadge } from "../filter/filter-badge";
 
 type HeaderProps = {
   countries: SelectionItem[];
@@ -42,8 +42,8 @@ export const Header = ({
         <DatePickerWithRange date={date} setDate={setDate} />
       </header>
       <div className="m-4 flex gap-2">
-        <BadgeFilter list={countries} setList={setCountries} />
-        <BadgeFilter list={businessUnit} setList={setBusinessUnit} />
+        <FilterBadge list={countries} setList={setCountries} />
+        <FilterBadge list={businessUnit} setList={setBusinessUnit} />
       </div>
     </>
   );

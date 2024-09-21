@@ -1,11 +1,18 @@
 import { Button } from "@/components/ui/button.tsx";
+import { SelectionItem } from "@/types";
 import { Cross1Icon } from "@radix-ui/react-icons";
+import { Dispatch, SetStateAction } from "react";
 
-export const BadgeFilter = ({ setList, list }) => {
-  const handleCheckedChange = (name, checked) => {
+type FilterBadgeProps = {
+  list: SelectionItem[];
+  setList: Dispatch<SetStateAction<SelectionItem[]>>;
+}
+
+export const FilterBadge = ({ list, setList }: FilterBadgeProps) => {
+  const handleCheckedChange = ({ name, isChecked }: SelectionItem) => {
     setList((prevState) =>
       prevState.map((item) =>
-        item.name === name ? { ...item, isChecked: !checked } : item,
+        item.name === name ? { ...item, isChecked: !isChecked } : item,
       ),
     );
   };
@@ -20,7 +27,7 @@ export const BadgeFilter = ({ setList, list }) => {
               <Button
                 variant="ghost"
                 className="h-8 w-8 rounded-full p-0 hover:bg-transparent hover:text-primary"
-                onClick={() => handleCheckedChange(value.name, value.isChecked)}
+                onClick={() => handleCheckedChange(value)}
               >
                 <Cross1Icon className="h-3 w-3" />
               </Button>
