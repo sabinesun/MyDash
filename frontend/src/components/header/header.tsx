@@ -2,7 +2,18 @@ import { Filter } from "@/components/filter/dropdown-filter.tsx";
 import { BadgeFilter } from "@/components/filter/badge-filter.tsx";
 import { BackpackIcon, GlobeIcon } from "@radix-ui/react-icons";
 import { DatePickerWithRange } from "@/components/ui/date-range.tsx";
-import * as React from "react";
+import { SelectionItem } from "@/types";
+import { DateRange } from "react-day-picker";
+import { Dispatch, SetStateAction } from "react";
+
+type HeaderProps = {
+  countries: SelectionItem[];
+  setCountries: Dispatch<SetStateAction<SelectionItem[]>>;
+  businessUnit: SelectionItem[];
+  setBusinessUnit: Dispatch<SetStateAction<SelectionItem[]>>;
+  date: DateRange | undefined;
+  setDate: Dispatch<SetStateAction<DateRange | undefined>>;
+}
 
 export const Header = ({
   countries,
@@ -11,7 +22,7 @@ export const Header = ({
   setBusinessUnit,
   date,
   setDate,
-}) => {
+}: HeaderProps) => {
   return (
     <>
       <header className="m-2 flex items-center">
