@@ -2,9 +2,9 @@ import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { subDays } from "date-fns";
 import { Header } from "@/components/header/header.tsx";
-import { CardIndicators } from "@/components/card/indicators-card.tsx";
 import { Dimension, SelectionItem } from "./types";
-import { LineChartContainer } from "./components/chart/chart-container";
+import { LineChartContainer } from "./components/chart/line-chart-container";
+import { CardContainer } from "./components/card/card-container";
 
 type DashboardProps = {
   dimensionsList: Dimension[];
@@ -36,7 +36,7 @@ export const Dashboard = ({
         setBusinessUnit={setBusinessUnits}
         date={date}
       />
-      <CardIndicators filteredIds={selectedDimensions} date={date} />
+      <CardContainer selectedDimensions={selectedDimensions} date={date} />
       <LineChartContainer selectedDimensions={selectedDimensions} date={date} />
     </>
   );
