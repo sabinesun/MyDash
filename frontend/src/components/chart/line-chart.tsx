@@ -73,7 +73,7 @@ export function IndicatorLineChart({ date, filteredIds, label, indicators }: Ind
             <Line
               dataKey={`dimension ${id}`}
               type="natural"
-              stroke="var(--color-value)"
+              stroke={`var(--color-dimension${id})`}
               strokeWidth={2}
               dot={false}
               key={`label ${id}`}
@@ -141,10 +141,14 @@ const findMinMax = (indicatorByDate: IndicatorByDate[]) => {
 }
 
 const chartConfig = (label: string) => {
-  return {
-    value: {
+  const config: Record<string, { label: string; color: string }> = {};
+
+  for (let i = 0; i <= 11; i++) {
+    config[`dimension${i}`] = {
       label: label,
-      color: "hsl(var(--primary))",
-    },
-  };
+      color: `hsl(var(--dimension${i}))`,
+    };
+  }
+
+  return config;
 };

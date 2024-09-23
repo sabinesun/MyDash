@@ -26,6 +26,19 @@
     --input: 240 5.9% 90%;
     --ring: 142.1 76.2% 36.3%;
     --radius: 0.5rem;
+
+    --dimension0: 142.1 76.2% 50%;
+    --dimension1: 150 50% 40%;
+    --dimension2: 142.1 60% 60%;
+    --dimension3: 142.1 76.2% 36.3%;
+    --dimension4: 142.1 76.2% 36.3%;
+    --dimension5: 142.1 90% 36.3%;
+    --dimension6: 142.1 50% 36.3%;
+    --dimension7: 142.1 30% 36.3%;
+    --dimension8: 152 76.2% 36.3%;
+    --dimension9: 130 76.2% 36.3%;
+    --dimension10: 142.1 76.2% 25%;
+    --dimension11: 142.1 50% 25%;
   }
 }
 
@@ -33,6 +46,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
