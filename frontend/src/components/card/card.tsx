@@ -1,6 +1,7 @@
 import { Indicator, IndicatorResponse } from "@/types";
 import { DateRange } from "react-day-picker";
 import { useQuery } from "react-query";
+import { CardContent } from "./card-content";
 
 type FetchIndicatorsParams = {
   startDate?: string;
@@ -30,31 +31,24 @@ export const Card = ({ selectedDimensions, date, label, cardIndicators, unit, ic
       }),
   });
 
-  if (isLoading || error || !data)
-    return (
-      <div className="flex w-full flex-col gap-2 rounded-md border border-primary bg-white p-8">
-        <div className="flex gap-2">
-          {icon}
-          <h2 className="text-lg">{label}</h2>
-        </div>
-        <p className="flex justify-end text-4xl">0</p>
-      </div>
-    );
+  if (isLoading) {
+    return <CardContent label={label} icon={icon} value="loading" />
+  }
 
-  return (
-    <div className="flex w-full flex-col gap-2 rounded-md border border-primary bg-white p-8">
-      <div className="flex gap-2">
-        {icon}
-        <h2 className="text-lg">{label}</h2>
-      </div>
-      <p className="flex justify-end text-4xl">
-        {label === "Gender Parity Ratio"
-          ? genderRatio(data.results)
-          : totalValue(data.results, cardIndicators)}
-        {unit}
-      </p>
-    </div>
-  );
+  if (error) {
+    return <CardContent label={label} icon={icon} value="error" />
+
+  }
+
+  if (!data || selectedDimensions.length === 0) {
+    return <CardContent label={label} icon={icon} value="no data" />
+  }
+
+  const value = label === "Gender Parity Ratio"
+    ? genderRatio(data.results)
+    : totalValue(data.results, cardIndicators)
+
+  return <CardContent label={label} icon={icon} value={value} unit={unit} />
 };
 
 const createParams = (paramName: string, values: string[]) =>
@@ -73,7 +67,7 @@ const fetchIndicators = async ({ startDate, endDate, dimensions, indicators }: F
 
 const totalValue = (indicatorList: Indicator[], indicators: string[]) => {
   return indicatorList.filter((item) => indicators.includes(item.indicator))
-    .reduce((sum, item) => sum + item.value, 0);
+    .reduce((sum, item) => sum + item.value, 0).toString();
 }
 
 const genderRatio = (indicatorList: Indicator[]) => {
