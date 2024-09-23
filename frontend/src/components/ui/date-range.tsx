@@ -27,7 +27,7 @@ export function DatePickerWithRange({ className, date, setDate }: DatePickerWith
             id="date"
             variant="outline"
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
+              "w-[300px] justify-start text-left font-normal bg-white",
               !date && "text-muted-foreground",
             )}
           >
