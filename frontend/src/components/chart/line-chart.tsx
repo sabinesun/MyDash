@@ -76,6 +76,7 @@ export function IndicatorLineChart({ date, filteredIds, label, indicators }: Ind
               stroke="var(--color-value)"
               strokeWidth={2}
               dot={false}
+              key={`label ${id}`}
             />
           ))}
         </LineChart>
