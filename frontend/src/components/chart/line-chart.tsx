@@ -7,6 +7,7 @@ import {
 import { useQuery } from "react-query";
 import { Indicator, IndicatorResponse } from "@/types";
 import { DateRange } from "react-day-picker";
+import { Typography } from "../typography/typography";
 
 type FetchIndicatorsParams = {
   startDate?: string;
@@ -47,7 +48,7 @@ export function IndicatorLineChart({ date, filteredIds, label, indicators }: Ind
 
   return (
     <div className="gap-2 rounded border border-primary bg-white p-10">
-      <h2 className="mb-8 text-lg">{label}</h2>
+      <Typography type="h2" text={label} />
       <ChartContainer config={chartConfig(label)}>
         <LineChart
           accessibilityLayer
