@@ -5,59 +5,45 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useQuery } from "react-query";
+import { Indicator, IndicatorResponse } from "@/types";
+import { DateRange } from "react-day-picker";
 
-const fetchIndicators = async ({ start, end, dimensions, indicators }) => {
-  const dimensionParams = dimensions
-    .map((number) => `&dimension=${number}`)
-    .join("");
-
-  const indicatorsParams = indicators
-    .map((indicator) => `&indicators=${indicator}`)
-    .join("");
-
-  const response = await fetch(
-    `http://localhost:8080/indicators?start=${start}&end=${end}${indicatorsParams}${dimensionParams}`,
-  );
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  return await response.json();
+type FetchIndicatorsParams = {
+  startDate?: string;
+  endDate?: string;
+  dimensions: string[];
+  indicators: string[];
 };
 
-const chartConfig = ({ label }) => {
-  return {
-    value: {
-      label: label,
-      color: "hsl(var(--primary))",
-    },
-  };
+type IndicatorLineChartProps = {
+  date: DateRange | undefined;
+  filteredIds: string[],
+  label: string,
+  indicators: string[]
+}
+
+type IndicatorByDate = {
+  date: string;
+  [key: `dimension ${string}`]: number;
 };
 
-export function IndicatorLineChart({ date, filteredIds, label, indicators }) {
+export function IndicatorLineChart({ date, filteredIds, label, indicators }: IndicatorLineChartProps) {
   const { isLoading, error, data } = useQuery({
     queryKey: ["indicators", indicators, date, filteredIds],
     queryFn: () =>
       fetchIndicators({
-        start: date?.from?.toISOString().split("T")[0],
-        end: date?.to?.toISOString().split("T")[0],
+        startDate: date?.from?.toISOString().split("T")[0],
+        endDate: date?.to?.toISOString().split("T")[0],
         dimensions: filteredIds,
         indicators: indicators,
       }),
   });
 
-  if (isLoading || error) return null;
+  if (isLoading || error || !data) return null;
 
-  const isSingleIndicator = indicators.length === 1;
+  const chartData = groupDataByDate(data.results)
 
-  const chartData = Object.values(
-    isSingleIndicator ? groupDataByDate(data) : groupDataByDateHeadcount(data),
-  );
-
-  const minMax = isSingleIndicator
-    ? findMinMax(chartData)
-    : findMinMaxHeadcount(chartData);
+  const minMax = findMinMax(chartData)
 
   return (
     <div className="gap-2 rounded border border-primary bg-white p-10">
@@ -78,14 +64,14 @@ export function IndicatorLineChart({ date, filteredIds, label, indicators }) {
             axisLine={false}
             tickMargin={8}
           />
-          <YAxis type="number" domain={[minMax?.smallest, minMax?.largest]} />
+          <YAxis type="number" domain={[minMax?.currentMin, minMax?.currentMax]} />
           <ChartTooltip
             cursor={false}
             content={<ChartTooltipContent hideLabel />}
           />
           {filteredIds.map((id) => (
             <Line
-              dataKey={isSingleIndicator ? id : `${id}.total`}
+              dataKey={`dimension ${id}`}
               type="natural"
               stroke="var(--color-value)"
               strokeWidth={2}
@@ -98,67 +84,66 @@ export function IndicatorLineChart({ date, filteredIds, label, indicators }) {
   );
 }
 
-const groupDataByDate = (data) => {
-  return data.results.reduce((acc, entry) => {
-    if (!acc[entry.date]) {
-      acc[entry.date] = { date: entry.date };
-    }
-    acc[entry.date][entry.dimension] = entry.value;
-    return acc;
-  }, {});
+const createParams = (paramName: string, values: string[]) =>
+  values.map((value) => `&${paramName}=${value}`).join("");
+
+const fetchIndicators = async ({ startDate, endDate, dimensions, indicators }: FetchIndicatorsParams): Promise<IndicatorResponse> => {
+  const url = `http://localhost:8080/indicators?start=${startDate}&end=${endDate}${createParams("indicators", indicators)}${createParams("dimensions", dimensions)}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  return await response.json();
 };
 
-const findMinMax = (dataArray) => {
-  return dataArray.reduce(
-    (acc, obj) => {
-      acc.smallest = Math.min(acc.smallest, obj.a, obj.b);
-      acc.largest = Math.max(acc.largest, obj.a, obj.b);
-      return acc;
+const groupDataByDate = (indicatorsList: Indicator[]) => {
+  let groupedIndicators: IndicatorByDate[] = [];
+
+  indicatorsList.forEach(indicator => {
+    let dateExist = groupedIndicators.find(item => item.date === indicator.date);
+
+    if (!dateExist) {
+      dateExist = { date: indicator.date };
+      groupedIndicators.push(dateExist);
+    }
+
+    if (dateExist[`dimension ${indicator.dimension}`]) {
+      dateExist[`dimension ${indicator.dimension}`] += indicator.value;
+    } else {
+      dateExist[`dimension ${indicator.dimension}`] = indicator.value;
+    }
+  });
+
+  return groupedIndicators;
+}
+
+const findMinMax = (indicatorByDate: IndicatorByDate[]) => {
+  let currentMax = -Infinity;
+  let currentMin = Infinity;
+  indicatorByDate.map((indicators) => {
+    const values = Object.values(indicators).slice(1) as number[];
+
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+
+    if (max > currentMax) {
+      currentMax = max;
+    }
+
+    if (min < currentMin) {
+      currentMin = min;
+    }
+  })
+  return { currentMax, currentMin }
+}
+
+const chartConfig = (label: string) => {
+  return {
+    value: {
+      label: label,
+      color: "hsl(var(--primary))",
     },
-    { smallest: Infinity, largest: -Infinity },
-  );
-};
-
-const groupDataByDateHeadcount = (data) => {
-  return data.results.reduce((acc, entry) => {
-    if (!acc[entry.date]) {
-      acc[entry.date] = { date: entry.date };
-    }
-
-    if (!acc[entry.date][entry.dimension]) {
-      acc[entry.date][entry.dimension] = {
-        female: 0,
-        male: 0,
-        total: 0,
-      };
-    }
-
-    if (entry.indicator === "female_headcount") {
-      acc[entry.date][entry.dimension].female = entry.value;
-    } else if (entry.indicator === "male_headcount") {
-      acc[entry.date][entry.dimension].male = entry.value;
-    }
-
-    acc[entry.date][entry.dimension].total =
-      acc[entry.date][entry.dimension].female +
-      acc[entry.date][entry.dimension].male;
-
-    return acc;
-  }, {});
-};
-
-const findMinMaxHeadcount = (dataArray) => {
-  return dataArray.reduce(
-    (acc, obj) => {
-      Object.values(obj).forEach((dimension) => {
-        if (dimension.total) {
-          acc.smallest = Math.min(acc.smallest, dimension.total);
-          acc.largest = Math.max(acc.largest, dimension.total);
-        }
-      });
-
-      return acc;
-    },
-    { smallest: Infinity, largest: -Infinity },
-  );
+  };
 };

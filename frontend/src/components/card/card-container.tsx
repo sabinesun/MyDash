@@ -23,6 +23,7 @@ export const CardContainer = ({ selectedDimensions, date }: CardContainerProps) 
         date={date}
         label="Co2 Emissions"
         cardIndicators={["co2_emissions"]}
+        unit="t CO2"
         icon={<Cloud size={24} className="text-primary" />}
       />
       <Card
