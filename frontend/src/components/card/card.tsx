@@ -67,7 +67,7 @@ const fetchIndicators = async ({ startDate, endDate, dimensions, indicators }: F
 
 const totalValue = (indicatorList: Indicator[], indicators: string[]) => {
   return indicatorList.filter((item) => indicators.includes(item.indicator))
-    .reduce((sum, item) => sum + item.value, 0).toString();
+    .reduce((sum, item) => sum + item.value, 0);
 }
 
 const genderRatio = (indicatorList: Indicator[]) => {
@@ -79,6 +79,5 @@ const genderRatio = (indicatorList: Indicator[]) => {
     .filter((item) => item.indicator === "male_headcount")
     .reduce((sum, item) => sum + item.value, 0);
 
-  return ((totalFemaleHeadcount / (totalFemaleHeadcount + totalMaleHeadcount)) * 100).toFixed(2);
+  return ((totalFemaleHeadcount / (totalFemaleHeadcount + totalMaleHeadcount)) * 100);
 }
-

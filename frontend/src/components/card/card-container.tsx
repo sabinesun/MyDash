@@ -15,7 +15,6 @@ export const CardContainer = ({ selectedDimensions, date }: CardContainerProps) 
         date={date}
         label="Total Revenue"
         cardIndicators={["total_revenue"]}
-        unit="$"
         icon={<Wallet size={24} className="text-primary" />}
       />
       <Card

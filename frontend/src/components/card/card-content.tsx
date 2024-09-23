@@ -1,7 +1,7 @@
 type CardProps = {
     label: string;
     icon: JSX.Element;
-    value: string;
+    value: number | string;
     unit?: string
 }
 
@@ -13,7 +13,7 @@ export const CardContent = ({ label, icon, value, unit }: CardProps) => {
                 <h2 className="text-lg">{label}</h2>
             </div>
             <p className="flex justify-end text-2xl">
-                {value}
+                {label === "Total Revenue" ? Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value)) : value.toLocaleString()}
                 {unit}
             </p>
         </div>
